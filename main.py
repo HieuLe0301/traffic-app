@@ -44,18 +44,20 @@ while True:
     fps = 1 / (toc - tic)
     tic = toc
     
-    results = model(frame,stream = True, verbose = False,imgsz = 320)
+    results_gen = model(frame,stream = True, verbose = False,imgsz = 320)
+    results = list(results_gen)
 
     person_count = 0
     chair_count = 0
-    for result in results:
-        annotated_frame = result.plot()
-        for box in result.boxes:
-            class_id = int(box.cls[0])
-            if class_id == 0:
-                person_count += 1
-            elif class_id == 56:
-                chair_count +=1
+
+    result = results[0]
+    annotated_frame = result.plot()
+    for box in result.boxes:
+        class_id = int(box.cls[0])
+        if class_id == 0:
+            person_count += 1
+        elif class_id == 56:
+            chair_count +=1
 
     cv2.putText(annotated_frame, f"FPS: {int(fps)}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
@@ -63,10 +65,8 @@ while True:
     cv2.putText(annotated_frame, f"Chairs: {chair_count}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
     cv2.imshow("YOLOv11 Desktop App", annotated_frame)
 
-    key = cv2.waitKey(1) & 0xFF 
+    cv2.waitKey(1) 
     
-    if key == ord('q'):
-        break
     # elif key == ord('s'):
     #     cam.release()
     #     if not cam_index == len(cam_indices) - 1:
@@ -79,3 +79,4 @@ while True:
         break
         
 cv2.destroyAllWindows()
+
